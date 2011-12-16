@@ -1,22 +1,22 @@
 <script>
+function post(url,params)
+{
+	xmlhttp=null;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("post",url,false);
+	xmlhttp.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+	xmlhttp.send(params);
+	var response = xmlhttp.responseText;
+	return(response);
+}
 function resolve_domain(domain, sendResponse) {
     function return__resolve_domain(ip) {
         sendResponse({ip: ip});
     }
-    req = new XMLHttpRequest();
-    req.open("POST", "http://www.aorpapardopiemonte.it/utilita/Ip-dominio/IP-dominio.php", true);
-    params = "myname="+domain+"&ipname="
-    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    req.setRequestHeader("Content-length", params.length);
-    req.setRequestHeader("Connection", "close"); 
-    req.onreadystatechange = function() {
-        if(req.readyState == 4 && req.status == 200) {
-            start_p = req.responseText.indexOf("href=")+5;
-            end_p = req.responseText.indexOf(" target", start_p);
-            return__resolve_domain(req.responseText.substr(start_p, end_p-start_p));
-        }
-    }
-    req.send(params);
+    var data = post('http://www.dnsfoundry.com/scripts/plugins/chrome/json.php', "domain="+btoa("http://"+domain));
+    start_p = data.indexOf("\"ip\":\"")+6;
+    end_p = data.indexOf("\"", start_p);
+    return__resolve_domain("http://"+data.substr(start_p, end_p-start_p));
 }
 
 chrome.extension.onRequest.addListener(
